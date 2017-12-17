@@ -1578,8 +1578,29 @@ src_tl_analysis_test_phase_libtest_analysis_la_SOURCES = \
                               src/tl/analysis/test_phase/tl-test-analysis-phase.cpp \
                               $(END)
 
-endif		# BUILD_ANALYSIS
+##########################################################################
+# src/tl/analysis/weighted_tdg
+##########################################################################
 
+phases_LTLIBRARIES += src/tl/analysis/weighted_tdg/libweighted_tdg.la
+
+src_tl_analysis_weighted_tdg_libweighted_tdg_la_CFLAGS = $(phases_cflags)
+src_tl_analysis_weighted_tdg_libweighted_tdg_la_CXXFLAGS = $(phases_cflags) \
+	$(ANALYSIS_CFLAGS) \
+	-I$(srcdir)/src/tl/analysis/interface \
+	-I$(srcdir)/src/tl/analysis/tdg
+src_tl_analysis_weighted_tdg_libweighted_tdg_la_LDFLAGS = $(phases_ldflags)
+src_tl_analysis_weighted_tdg_libweighted_tdg_la_LIBADD = $(phases_libadd) \
+	$(ANALYSIS_LIBADD) \
+	src/tl/analysis/interface/libanalysis_interface.la \
+	src/tl/analysis/tdg/libtdg.la
+
+src_tl_analysis_weighted_tdg_libweighted_tdg_la_SOURCES = \
+	src/tl/analysis/weighted_tdg/tl-weighted-tdg-phase.hpp \
+	src/tl/analysis/weighted_tdg/tl-weighted-tdg-phase.cpp \
+	$(END)
+
+endif		# BUILD_ANALYSIS
 ##########################################################################
 # src/tl/hlt
 ##########################################################################
