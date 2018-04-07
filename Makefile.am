@@ -3824,7 +3824,7 @@ EXTRA_DIST += \
 # support/jsonlib
 ##########################################################################
 
-jsonlib_dir=$(pkgdatadir)/jsonlib
+jsonlibdir=$(pkgdatadir)/jsonlib
 
 jsonlib_DATA = \
               support/jsonlib/picojson.h \
