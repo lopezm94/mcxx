@@ -49,6 +49,7 @@ linker_name = @GCC@
 {auto-scope} options = --variable=auto_scope_enabled:1
 {tdg} options = --variable=tdg_enabled:1
 {etdg} options = --variable=etdg_enabled:1
+{wtdg} preprocessor_options = -I @PKGDATADIR@/jsonlib -include picojson.h
 {wtdg} compiler_phase = libweighted_tdg.so
 {analysis-check} pragma_prefix = analysis_check
 {analysis-check} compiler_phase = libanalysis_check.so

@@ -41,9 +41,16 @@ namespace Analysis {
     private:
 
     public:
+
+        node_t device;
+        size_t data_size;
         Ret unhandled_node(const Nodecl::NodeclBase& n);
 
-        Ret visit(const Nodecl::OpenMP::Task& n);
+        Ret visit(const Nodecl::OpenMP::Device& n);
+        Ret visit(const Nodecl::OpenMP::Symbol& n);             // (ej.: x)
+        Ret visit(const Nodecl::OpenMP::ArraySubscript& n);     // (ej.: a[i])
+        Ret visit(const Nodecl::OpenMP::ClassMemberAccess& n);  //(ej.: str.x)
+        Ret visit(const Nodecl::OpenMP::DepIn& n);              // para no visitar las dependencias in
     };
 
     //! Phase that creates an ETDG and enriches it with information about communication cost, task execution cost, etc.

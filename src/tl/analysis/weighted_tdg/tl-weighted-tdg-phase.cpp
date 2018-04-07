@@ -44,23 +44,29 @@ namespace Analysis {
         WARNING_MESSAGE("Unhandled node of type '%s' while Weighted-ETDG transformations.\n",
                         ast_print_node_type(n.get_kind()));
     }
-    
-    void Task2FPGA::visit(const Nodecl::OpenMP::Task& n)
+
+    void Task2FPGA::visit(Nodecl::OpenMP::Device& n)
     {
-        // 1.- Create the node with the value of the onto clause
-        //     FIXME The value of onto_value_nodecl will be the one in id2Onto[xx]
-        unsigned onto_value = 0;
-        Nodecl::IntegerLiteral onto_value_nodecl = Nodecl::IntegerLiteral::make(
-                Type::get_unsigned_int_type(),
-                const_value_get_integer(onto_value, /*num_bytes*/4, /*sign*/0));
-        Nodecl::List onto_exprs = Nodecl::List::make(onto_value_nodecl);
-
-        // 2.- Create the onto clause
-        Nodecl::OmpSs::Onto onto_clause = Nodecl::OmpSs::Onto::make(onto_exprs);
-
-        // 3.- Add the onto clause to the task
-        n.get_environment().as<Nodecl::List>().append(onto_clause);
+        device = n.get_type().get_kind();
     }
+
+    void Task2FPGA::visit(Nodecl::OpenMP::Symbol& n)
+    {
+        data_size += n.get_type().get_size();  (equivalente a sizeof() )
+    }
+
+    void Task2FPGA::visit(Nodecl::OpenMP::ArraySubscript& n)
+    {
+        data_size += n.get_type().get_size();  (equivalente a sizeof() )
+    }
+
+    void Task2FPGA::visit(Nodecl::OpenMP::ClassMemberAccess& n)
+    {
+        data_size += n.get_type().get_size();  (equivalente a sizeof() )
+    }
+
+    void Task2FPGA::visit(Nodecl::OpenMP::DepIn& n)
+    { /* do nothing */ }
 
     // ********************** END Visitor to enrich Task nodes ********************** //
     // ****************************************************************************** //
@@ -142,11 +148,11 @@ namespace {
         for (ObjectList<TaskDependencyGraph*>::iterator it = tdgs.begin(); it != tdgs.end(); ++it)
         {
             ExpandedTaskDependencyGraph* etdg = (*it)->get_etdg();
-             std::vector<SubETDG*> sub_tdgs = etdg->get_etdgs();
-             for (ObjectList<SubETDG*>::iterator itt = sub_tdgs.begin(); itt != sub_tdgs.end(); ++itt)
-             {
-                 traverse_subetdg(*itt);
-             }
+            std::vector<SubETDG*> sub_tdgs = etdg->get_etdgs();
+            for (ObjectList<SubETDG*>::iterator itt = sub_tdgs.begin(); itt != sub_tdgs.end(); ++itt)
+            {
+                traverse_subetdg(*itt);
+            }
         }
 
         // 5.- Add information to the tdg
@@ -160,12 +166,19 @@ namespace {
         if (n->is_visited())
             return;
         n->set_visited(true);
-        // std::cerr << "Traversing node " << n->get_id() << std::endl;
 
-        // TODO Do your work on the node here
+//        // Print the node
+//        dot_tdg << "      " << n->get_id() << "\n";
+//
+//         // Print the entry edges
+//        const std::set<ETDGNode*>& inputs = n->get_inputs();
+//        for (std::set<ETDGNode*>::const_iterator it = inputs.begin(); it != inputs.end(); ++it)
+//        {
+//            etdg_connections.insert(std::pair<unsigned, unsigned>((*it)->get_id(), n->get_id()));
+//        }
         
 
-        // Keep iterating over the node's childre
+        // Keep iterating over the node's children
         std::set<ETDGNode*> outputs = n->get_outputs();
         for (std::set<ETDGNode*>::iterator it = outputs.begin(); it != outputs.end(); ++it)
         {
@@ -178,6 +191,11 @@ namespace {
         const ObjectList<ETDGNode*>& roots = etdg->get_roots();
         for (ObjectList<ETDGNode*>::const_iterator it = roots.begin(); it != roots.end(); ++it)
         {
+            NodeclBase n = (it)->get_source_task();
+            Nodecl::List environ = n.get_environment().as<Nodecl::List>();
+
+            MyVisitor mv;
+            mv.walk(environ);
             traverse_subetdg_rec(*it);
         }
 

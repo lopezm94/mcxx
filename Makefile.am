@@ -3339,7 +3339,7 @@ BUILT_SOURCES += $(INSTALL_CONFIG_FILES) $(INSTALL_SCRIPT_COMPILER_NAMES)
 # Generates configs
 config/% : config/template.$(notdir %) Makefile
 	$(AM_V_GEN)( $(config_edit) "$<" > "$@.tmp"; mv -f "$@.tmp" "$@" )
- 
+
 config-install-data-hook: remove-old-profiles
 
 EXTRA_DIST += \
@@ -3818,6 +3818,20 @@ endif
 
 EXTRA_DIST += \
 			support/romol/valib.h \
+			$(END)
+
+##########################################################################
+# support/jsonlib
+##########################################################################
+
+jsonlib_dir=$(pkgdatadir)/jsonlib
+
+jsonlib_DATA = \
+              support/jsonlib/picojson.h \
+              $(END)
+
+EXTRA_DIST += \
+			support/jsonlib/picojson.h \
 			$(END)
 
 ##########################################################################
